@@ -1,4 +1,4 @@
-import type { RiskLevel } from '../../types'
+import type { RiskLevel } from '../types'
 
 const barColors: Record<RiskLevel, string> = {
   low: 'bg-emerald-500',

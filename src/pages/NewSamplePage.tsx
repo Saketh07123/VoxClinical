@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react'
 import { AlertCircle, FileAudio, Loader2, Mic, Square, Type, Upload } from 'lucide-react'
 import { useSamples } from '../context/SampleContext'
-import { Card, CardBody, CardHeader } from '../components/ui/Card'
-import { Button } from '../components/ui/Button'
+import { Card, CardBody, CardHeader } from '../components/Card'
+import { Button } from '../components/Button'
 
 type InputMode = 'speech-upload' | 'speech-record' | 'text'
 

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { useSamples, useSelectedSample } from '../context/SampleContext'
 import { ModelResultCard } from '../components/ModelResultCard'
-import { Card, CardBody } from '../components/ui/Card'
-import { StatusBadge, TypeBadge } from '../components/ui/Badge'
-import { Button } from '../components/ui/Button'
-import { createAudioUrl } from '../lib/audioFeatures'
+import { Card, CardBody } from '../components/Card'
+import { StatusBadge, TypeBadge } from '../components/Badge'
+import { Button } from '../components/Button'
+import { createAudioUrl } from '../analysis/audioFeatures'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-US', {

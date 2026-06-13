@@ -1,8 +1,8 @@
 import { ArrowRight, Brain, Mic, PlusCircle } from 'lucide-react'
 import { useSamples } from '../context/SampleContext'
-import { Card, CardBody, CardHeader } from '../components/ui/Card'
-import { Button } from '../components/ui/Button'
-import { RiskBadge, TypeBadge } from '../components/ui/Badge'
+import { Card, CardBody, CardHeader } from '../components/Card'
+import { Button } from '../components/Button'
+import { RiskBadge, TypeBadge } from '../components/Badge'
 import { ModelResultCard } from '../components/ModelResultCard'
 
 function formatDate(iso: string) {

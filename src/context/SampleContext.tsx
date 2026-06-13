@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { AddSampleInput, PageId, Sample } from '../types'
-import { analyzeSample } from '../lib/analyzeSample'
-import { loadAudioBlob, loadSamples, saveAudioBlob, saveSamples } from '../lib/storage'
+import { analyzeSample } from '../analysis/analyzeSample'
+import { loadAudioBlob, loadSamples, saveAudioBlob, saveSamples } from '../analysis/storage'
 
 interface SampleContextValue {
   samples: Sample[]

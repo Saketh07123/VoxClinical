@@ -1,8 +1,8 @@
 import { Brain, Mic } from 'lucide-react'
 import { useSamples } from '../context/SampleContext'
-import { Card, CardBody, CardHeader } from '../components/ui/Card'
-import { RiskBadge, StatusBadge, TypeBadge } from '../components/ui/Badge'
-import { Button } from '../components/ui/Button'
+import { Card, CardBody, CardHeader } from '../components/Card'
+import { RiskBadge, StatusBadge, TypeBadge } from '../components/Badge'
+import { Button } from '../components/Button'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {

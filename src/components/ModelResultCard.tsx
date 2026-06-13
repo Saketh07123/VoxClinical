@@ -1,7 +1,7 @@
 import type { ModelResult } from '../types'
-import { Card, CardBody, CardHeader } from './ui/Card'
-import { RiskBadge } from './ui/Badge'
-import { MarkerRow, ProgressBar } from './ui/ProgressBar'
+import { Card, CardBody, CardHeader } from './Card'
+import { RiskBadge } from './Badge'
+import { MarkerRow, ProgressBar } from './ProgressBar'
 
 const accentColors = {
   "Parkinson's": 'border-l-parkinson',

@@ -1,4 +1,4 @@
-import type { RiskLevel } from '../../types'
+import type { RiskLevel } from '../types'
 
 const styles: Record<RiskLevel, string> = {
   low: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
