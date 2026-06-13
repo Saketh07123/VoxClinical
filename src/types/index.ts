@@ -14,7 +14,7 @@ export interface LinguisticMarker {
 
 export interface ModelResult {
   modelName: string
-  condition: "Parkinson's" | 'Dysarthria'
+  condition: "Parkinson's" | 'Dementia'
   riskScore: number | null
   riskLevel: RiskLevel | null
   confidence: number | null
@@ -37,8 +37,8 @@ export interface Sample {
   results?: {
     parkinsonAcoustic: ModelResult
     parkinsonLinguistic: ModelResult
-    dysarthriaAcoustic: ModelResult
-    dysarthriaLinguistic: ModelResult
+    dementiaAcoustic: ModelResult
+    dementiaLinguistic: ModelResult
   }
 }
 

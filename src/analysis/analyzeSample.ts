@@ -60,7 +60,7 @@ function buildParkinsonAcousticResult(
       label: 'Speech rate',
       value: speechRate,
       unit: 'wpm',
-      description: 'Words per minute — reduced rate and irregularity are hallmarks of hypokinetic dysarthria in PD',
+      description: 'Words per minute — reduced rate and irregularity are hallmarks of hypokinetic dementia in PD',
     })
   }
 
@@ -136,7 +136,7 @@ function buildParkinsonAcousticResult(
 
   let summary = 'Acoustic markers computed from the submitted recording.'
   if (composite !== null) {
-    if (composite >= 65) summary = 'Acoustic markers show elevated pause frequency or reduced prosody variation consistent with hypokinetic dysarthria.'
+    if (composite >= 65) summary = 'Acoustic markers show elevated pause frequency or reduced prosody variation consistent with hypokinetic dementia.'
     else if (composite >= 35) summary = 'Some acoustic markers fall outside typical ranges.'
     else summary = 'Acoustic markers are within typical ranges for the extracted features.'
   }
@@ -229,24 +229,24 @@ function buildParkinsonLinguisticResult(text: string | null): ModelResult {
   }
 }
 
-// ── Dysarthria Acoustic (DysarthriaSpeech-v1) ─────────────────────────────────────────────
+// ── Dementia Acoustic (DementiaSpeech-v1) ─────────────────────────────────────────────
 // Markers: speech rate, avg pause duration, pause frequency, prosody variation
-// Dysarthria causes progressive articulatory weakness — slower rate, prolonged pauses
+// Dementia causes progressive articulatory weakness — slower rate, prolonged pauses
 
-function buildDysarthriaAcousticResult(
+function buildDementiaAcousticResult(
   audioFeatures: AudioFeatures | null,
   wordCount: number,
   durationSeconds: number | undefined,
 ): ModelResult {
   if (!audioFeatures) {
     return {
-      modelName: 'DysarthriaSpeech-v1',
-      condition: 'Dysarthria',
+      modelName: 'DementiaSpeech-v1',
+      condition: 'Dementia',
       riskScore: null,
       riskLevel: null,
       confidence: null,
       markers: [],
-      summary: 'No audio provided. Submit a speech recording for acoustic dysarthria analysis.',
+      summary: 'No audio provided. Submit a speech recording for acoustic dementia analysis.',
     }
   }
 
@@ -259,7 +259,7 @@ function buildDysarthriaAcousticResult(
       label: 'Speech rate',
       value: speechRate,
       unit: 'wpm',
-      description: 'Words per minute — articulatory muscle weakness in dysarthria causes progressive speech slowing',
+      description: 'Words per minute — articulatory muscle weakness in dementia causes progressive speech slowing',
     })
   }
 
@@ -269,7 +269,7 @@ function buildDysarthriaAcousticResult(
       label: 'Avg pause duration',
       value: audioFeatures.avgPauseDurationMs,
       unit: 'ms',
-      description: 'Mean pause length — prolonged pauses reflect articulatory fatigue characteristic of dysarthria',
+      description: 'Mean pause length — prolonged pauses reflect articulatory fatigue characteristic of dementia',
     },
     {
       id: 'pause-freq',
@@ -297,14 +297,14 @@ function buildDysarthriaAcousticResult(
 
   if (speechRateMarker) {
     const rate = speechRateMarker.value
-    // Dysarthria: strong signal below 90 wpm; mild signal above 160 wpm (rushing due to breath support loss)
+    // Dementia: strong signal below 90 wpm; mild signal above 160 wpm (rushing due to breath support loss)
     if (rate < 90) riskScore += clamp(((90 - rate) / 60) * 100, 0, 100)
     else if (rate > 160) riskScore += clamp(((rate - 160) / 60) * 100, 0, 100) * 0.3
     factors++
   }
 
   if (avgPauseMarker) {
-    // Dysarthria: pause duration is a stronger signal than frequency (articulatory fatigue)
+    // Dementia: pause duration is a stronger signal than frequency (articulatory fatigue)
     riskScore += clamp((avgPauseMarker.value / 800) * 100, 0, 100)
     factors++
   }
@@ -329,14 +329,14 @@ function buildDysarthriaAcousticResult(
 
   let summary = 'Acoustic markers computed from the submitted recording.'
   if (composite !== null) {
-    if (composite >= 65) summary = 'Acoustic markers suggest bulbar motor involvement — reduced speech rate or prolonged pauses consistent with dysarthria.'
+    if (composite >= 65) summary = 'Acoustic markers suggest bulbar motor involvement — reduced speech rate or prolonged pauses consistent with dementia.'
     else if (composite >= 35) summary = 'Some acoustic markers fall outside typical ranges.'
     else summary = 'Acoustic markers are within typical ranges for the extracted features.'
   }
 
   return {
-    modelName: 'DysarthriaSpeech-v1',
-    condition: 'Dysarthria',
+    modelName: 'DementiaSpeech-v1',
+    condition: 'Dementia',
     riskScore: composite,
     riskLevel: composite !== null ? riskFromScore(composite) : null,
     confidence: composite !== null ? confidence : null,
@@ -345,14 +345,14 @@ function buildDysarthriaAcousticResult(
   }
 }
 
-// ── Dysarthria Linguistic (DysarthriaLex-v1) ──────────────────────────────────────────────
+// ── Dementia Linguistic (DementiaLex-v1) ──────────────────────────────────────────────
 // Markers: semantic coherence, lexical diversity, idea density, pronoun ratio
 
-function buildDysarthriaLinguisticResult(text: string | null): ModelResult {
+function buildDementiaLinguisticResult(text: string | null): ModelResult {
   if (!text || text.trim().length < 20) {
     return {
-      modelName: 'DysarthriaLex-v1',
-      condition: 'Dysarthria',
+      modelName: 'DementiaLex-v1',
+      condition: 'Dementia',
       riskScore: null,
       riskLevel: null,
       confidence: null,
@@ -373,7 +373,7 @@ function buildDysarthriaLinguisticResult(text: string | null): ModelResult {
       label: 'Semantic coherence',
       value: coherence,
       unit: '%',
-      description: 'Keyword overlap between consecutive sentences — dysarthria-related cognitive involvement reduces coherence',
+      description: 'Keyword overlap between consecutive sentences — dementia-related cognitive involvement reduces coherence',
     },
     {
       id: 'lexical-div',
@@ -387,7 +387,7 @@ function buildDysarthriaLinguisticResult(text: string | null): ModelResult {
       label: 'Idea density',
       value: ideaDensity,
       unit: 'words/sent',
-      description: 'Content words per sentence — reduced in dysarthria-related language changes',
+      description: 'Content words per sentence — reduced in dementia-related language changes',
     },
     {
       id: 'pronoun-ratio',
@@ -413,7 +413,7 @@ function buildDysarthriaLinguisticResult(text: string | null): ModelResult {
 
   let summary = 'Linguistic markers computed from the submitted text.'
   if (composite >= 65) {
-    summary = 'Linguistic markers suggest possible bulbar or cognitive speech patterns associated with dysarthria.'
+    summary = 'Linguistic markers suggest possible bulbar or cognitive speech patterns associated with dementia.'
   } else if (composite >= 35) {
     summary = 'Some linguistic markers fall outside typical ranges.'
   } else {
@@ -421,8 +421,8 @@ function buildDysarthriaLinguisticResult(text: string | null): ModelResult {
   }
 
   return {
-    modelName: 'DysarthriaLex-v1',
-    condition: 'Dysarthria',
+    modelName: 'DementiaLex-v1',
+    condition: 'Dementia',
     riskScore: composite,
     riskLevel: riskFromScore(composite),
     confidence,
@@ -454,10 +454,10 @@ export async function analyzeSample(input: AddSampleInput): Promise<{
 
   const parkinsonAcoustic = buildParkinsonAcousticResult(speechAudio, wordCount, durationSeconds)
   const parkinsonLinguistic = buildParkinsonLinguisticResult(analysisText)
-  const dysarthriaAcoustic = buildDysarthriaAcousticResult(speechAudio, wordCount, durationSeconds)
-  const dysarthriaLinguistic = buildDysarthriaLinguisticResult(analysisText)
+  const dementiaAcoustic = buildDementiaAcousticResult(speechAudio, wordCount, durationSeconds)
+  const dementiaLinguistic = buildDementiaLinguisticResult(analysisText)
 
-  const allNull = [parkinsonAcoustic, parkinsonLinguistic, dysarthriaAcoustic, dysarthriaLinguistic]
+  const allNull = [parkinsonAcoustic, parkinsonLinguistic, dementiaAcoustic, dementiaLinguistic]
     .every((r) => r.riskScore === null)
 
   if (allNull) {
@@ -471,7 +471,7 @@ export async function analyzeSample(input: AddSampleInput): Promise<{
   return {
     durationSeconds,
     transcript: input.transcript,
-    results: { parkinsonAcoustic, parkinsonLinguistic, dysarthriaAcoustic, dysarthriaLinguistic },
+    results: { parkinsonAcoustic, parkinsonLinguistic, dementiaAcoustic, dementiaLinguistic },
   }
 }
 

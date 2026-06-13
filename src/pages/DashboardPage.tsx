@@ -27,7 +27,7 @@ export function DashboardPage() {
         <h2 className="mt-4 text-xl font-bold text-slate-900">No samples yet</h2>
         <p className="mt-2 max-w-md text-sm text-slate-500">
           Submit a speech recording or text sample to analyze linguistic markers for
-          Parkinson&apos;s and Dysarthria.
+          Parkinson&apos;s and Dementia.
         </p>
         <Button className="mt-6" onClick={() => setCurrentPage('new-sample')}>
           <PlusCircle className="h-4 w-4" />
@@ -88,8 +88,8 @@ export function DashboardPage() {
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <ModelResultCard result={latest.results.parkinsonAcoustic} />
             <ModelResultCard result={latest.results.parkinsonLinguistic} />
-            <ModelResultCard result={latest.results.dysarthriaAcoustic} />
-            <ModelResultCard result={latest.results.dysarthriaLinguistic} />
+            <ModelResultCard result={latest.results.dementiaAcoustic} />
+            <ModelResultCard result={latest.results.dementiaLinguistic} />
           </div>
         </div>
       )}
@@ -128,8 +128,8 @@ export function DashboardPage() {
                   {(sample.results?.parkinsonAcoustic.riskLevel ?? sample.results?.parkinsonLinguistic.riskLevel) && (
                     <RiskBadge level={(sample.results.parkinsonAcoustic.riskLevel ?? sample.results.parkinsonLinguistic.riskLevel)!} />
                   )}
-                  {(sample.results?.dysarthriaAcoustic.riskLevel ?? sample.results?.dysarthriaLinguistic.riskLevel) && (
-                    <RiskBadge level={(sample.results.dysarthriaAcoustic.riskLevel ?? sample.results.dysarthriaLinguistic.riskLevel)!} />
+                  {(sample.results?.dementiaAcoustic.riskLevel ?? sample.results?.dementiaLinguistic.riskLevel) && (
+                    <RiskBadge level={(sample.results.dementiaAcoustic.riskLevel ?? sample.results.dementiaLinguistic.riskLevel)!} />
                   )}
                 </div>
               </button>

@@ -5,12 +5,12 @@ import { MarkerRow, ProgressBar } from './ProgressBar'
 
 const accentColors = {
   "Parkinson's": 'border-l-parkinson',
-  Dysarthria: 'border-l-als',
+  Dementia: 'border-l-als',
 }
 
 const scoreColors = {
   "Parkinson's": 'text-parkinson',
-  Dysarthria: 'text-als',
+  Dementia: 'text-als',
 }
 
 export function ModelResultCard({ result }: { result: ModelResult }) {
