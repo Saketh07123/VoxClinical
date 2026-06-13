@@ -61,13 +61,24 @@ export function HistoryPage() {
                     <StatusBadge status={sample.status} />
                   </td>
                   <td className="px-5 py-3.5">
-                    {sample.results?.parkinson.riskScore != null ? (
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-parkinson">
-                          {sample.results.parkinson.riskScore}
-                        </span>
-                        {sample.results.parkinson.riskLevel && (
-                          <RiskBadge level={sample.results.parkinson.riskLevel} />
+                    {sample.results ? (
+                      <div className="space-y-1">
+                        {sample.results.parkinsonAcoustic.riskScore != null && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-slate-400">Ac</span>
+                            <span className="font-semibold text-parkinson">{sample.results.parkinsonAcoustic.riskScore}</span>
+                            <RiskBadge level={sample.results.parkinsonAcoustic.riskLevel!} />
+                          </div>
+                        )}
+                        {sample.results.parkinsonLinguistic.riskScore != null && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-slate-400">Lx</span>
+                            <span className="font-semibold text-parkinson">{sample.results.parkinsonLinguistic.riskScore}</span>
+                            <RiskBadge level={sample.results.parkinsonLinguistic.riskLevel!} />
+                          </div>
+                        )}
+                        {sample.results.parkinsonAcoustic.riskScore == null && sample.results.parkinsonLinguistic.riskScore == null && (
+                          <span className="text-slate-400">—</span>
                         )}
                       </div>
                     ) : (
@@ -75,13 +86,24 @@ export function HistoryPage() {
                     )}
                   </td>
                   <td className="px-5 py-3.5">
-                    {sample.results?.als.riskScore != null ? (
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-als">
-                          {sample.results.als.riskScore}
-                        </span>
-                        {sample.results.als.riskLevel && (
-                          <RiskBadge level={sample.results.als.riskLevel} />
+                    {sample.results ? (
+                      <div className="space-y-1">
+                        {sample.results.alsAcoustic.riskScore != null && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-slate-400">Ac</span>
+                            <span className="font-semibold text-als">{sample.results.alsAcoustic.riskScore}</span>
+                            <RiskBadge level={sample.results.alsAcoustic.riskLevel!} />
+                          </div>
+                        )}
+                        {sample.results.alsLinguistic.riskScore != null && (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-slate-400">Lx</span>
+                            <span className="font-semibold text-als">{sample.results.alsLinguistic.riskScore}</span>
+                            <RiskBadge level={sample.results.alsLinguistic.riskLevel!} />
+                          </div>
+                        )}
+                        {sample.results.alsAcoustic.riskScore == null && sample.results.alsLinguistic.riskScore == null && (
+                          <span className="text-slate-400">—</span>
                         )}
                       </div>
                     ) : (

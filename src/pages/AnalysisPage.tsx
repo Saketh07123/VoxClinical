@@ -147,9 +147,21 @@ export function AnalysisPage() {
       )}
 
       {sample.status === 'complete' && sample.results && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          <ModelResultCard result={sample.results.parkinson} />
-          <ModelResultCard result={sample.results.als} />
+        <div className="space-y-8">
+          <div>
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Parkinson&apos;s Disease</h3>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <ModelResultCard result={sample.results.parkinsonAcoustic} />
+              <ModelResultCard result={sample.results.parkinsonLinguistic} />
+            </div>
+          </div>
+          <div>
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">ALS (Amyotrophic Lateral Sclerosis)</h3>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <ModelResultCard result={sample.results.alsAcoustic} />
+              <ModelResultCard result={sample.results.alsLinguistic} />
+            </div>
+          </div>
         </div>
       )}
     </div>

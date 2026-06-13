@@ -1,4 +1,5 @@
 import type { AddSampleInput, ModelResult, RiskLevel, Sample } from '../types'
+import type { AudioFeatures } from './audioFeatures'
 import { extractAudioFeatures, getAudioDuration } from './audioFeatures'
 import { extractTextFeatures, getAnalysisText } from './textFeatures'
 
@@ -42,8 +43,11 @@ function computeConfidence(opts: {
   return clamp(score, 0, 100)
 }
 
-function buildParkinsonResult(
-  audioFeatures: Awaited<ReturnType<typeof extractAudioFeatures>> | null,
+// ── PD Acoustic (ParkSpeech-v2) ─────────────────────────────────────────────
+// Markers: speech rate, pause frequency, avg pause duration, prosody variation
+
+function buildParkinsonAcousticResult(
+  audioFeatures: AudioFeatures | null,
   wordCount: number,
   durationSeconds: number | undefined,
 ): ModelResult {
@@ -56,7 +60,7 @@ function buildParkinsonResult(
       label: 'Speech rate',
       value: speechRate,
       unit: 'wpm',
-      description: 'Words per minute (transcript word count ÷ duration)',
+      description: 'Words per minute — reduced rate and irregularity are hallmarks of hypokinetic dysarthria in PD',
     })
   }
 
@@ -67,7 +71,7 @@ function buildParkinsonResult(
         label: 'Pause frequency',
         value: audioFeatures.pauseFrequencyPerMinute,
         unit: '/min',
-        description: 'Silent segments ≥250ms detected from audio amplitude',
+        description: 'Silent segments ≥250ms per minute detected from audio amplitude',
       },
       {
         id: 'avg-pause',
@@ -81,7 +85,7 @@ function buildParkinsonResult(
         label: 'Prosody variation',
         value: audioFeatures.prosodyVariation,
         unit: '%',
-        description: 'RMS energy variation across the recording',
+        description: 'RMS energy variation across the recording — monotone speech is a key PD acoustic marker',
       },
     )
   }
@@ -94,7 +98,7 @@ function buildParkinsonResult(
       riskLevel: null,
       confidence: null,
       markers: [],
-      summary: 'Insufficient speech data. Provide audio and a transcript for acoustic analysis.',
+      summary: 'No audio provided. Submit a speech recording for acoustic PD analysis.',
     }
   }
 
@@ -132,7 +136,7 @@ function buildParkinsonResult(
 
   let summary = 'Acoustic markers computed from the submitted recording.'
   if (composite !== null) {
-    if (composite >= 65) summary = 'Acoustic markers show elevated pause frequency or reduced prosody variation.'
+    if (composite >= 65) summary = 'Acoustic markers show elevated pause frequency or reduced prosody variation consistent with hypokinetic dysarthria.'
     else if (composite >= 35) summary = 'Some acoustic markers fall outside typical ranges.'
     else summary = 'Acoustic markers are within typical ranges for the extracted features.'
   }
@@ -148,7 +152,203 @@ function buildParkinsonResult(
   }
 }
 
-function buildAlsResult(text: string | null): ModelResult {
+// ── PD Linguistic (ParkLex-v1) ───────────────────────────────────────────────
+// Markers: lexical richness, avg sentence length, content word ratio
+
+function buildParkinsonLinguisticResult(text: string | null): ModelResult {
+  if (!text || text.trim().length < 20) {
+    return {
+      modelName: 'ParkLex-v1',
+      condition: "Parkinson's",
+      riskScore: null,
+      riskLevel: null,
+      confidence: null,
+      markers: [],
+      summary: 'Insufficient text. Provide at least 20 characters of transcript or text content.',
+    }
+  }
+
+  const features = extractTextFeatures(text)
+  const lexicalRichness = round0(features.typeTokenRatio * 100)
+  const avgSentenceLength = round1(features.avgWordsPerSentence)
+  const contentWordRatio = round0(features.contentWordRatio)
+
+  const markers = [
+    {
+      id: 'lexical-richness',
+      label: 'Lexical richness',
+      value: lexicalRichness,
+      unit: '%',
+      description: 'Type-token ratio — vocabulary breadth relative to total words; reduced in PD-related language changes',
+    },
+    {
+      id: 'sentence-length',
+      label: 'Avg sentence length',
+      value: avgSentenceLength,
+      unit: 'words',
+      description: 'Mean words per sentence — syntactic simplification leads to shorter sentences in PD',
+    },
+    {
+      id: 'content-ratio',
+      label: 'Content word ratio',
+      value: contentWordRatio,
+      unit: '%',
+      description: 'Share of content (non-function) words — reduced ratio reflects lexical access difficulties',
+    },
+  ]
+
+  let riskScore = 0
+  riskScore += clamp(100 - lexicalRichness, 0, 100) * 0.4
+  riskScore += clamp(((10 - Math.min(avgSentenceLength, 10)) / 10) * 100, 0, 100) * 0.3
+  riskScore += clamp(100 - contentWordRatio, 0, 100) * 0.3
+
+  const composite = round0(riskScore)
+  const confidence = computeConfidence({
+    wordCount: features.wordCount,
+    hasTranscript: true,
+    type: 'text',
+  })
+
+  let summary = 'Linguistic markers computed from the submitted text.'
+  if (composite >= 65) {
+    summary = 'Linguistic markers suggest reduced lexical richness and syntactic simplification associated with PD.'
+  } else if (composite >= 35) {
+    summary = 'Some linguistic markers fall outside typical ranges.'
+  } else {
+    summary = 'Linguistic markers are within typical ranges for the extracted features.'
+  }
+
+  return {
+    modelName: 'ParkLex-v1',
+    condition: "Parkinson's",
+    riskScore: composite,
+    riskLevel: riskFromScore(composite),
+    confidence,
+    markers,
+    summary,
+  }
+}
+
+// ── ALS Acoustic (ALS-Speech-v1) ─────────────────────────────────────────────
+// Markers: speech rate, avg pause duration, pause frequency, prosody variation
+// ALS bulbar onset causes progressive articulatory weakness — slower rate, prolonged pauses
+
+function buildAlsAcousticResult(
+  audioFeatures: AudioFeatures | null,
+  wordCount: number,
+  durationSeconds: number | undefined,
+): ModelResult {
+  if (!audioFeatures) {
+    return {
+      modelName: 'ALS-Speech-v1',
+      condition: 'ALS',
+      riskScore: null,
+      riskLevel: null,
+      confidence: null,
+      markers: [],
+      summary: 'No audio provided. Submit a speech recording for acoustic ALS analysis.',
+    }
+  }
+
+  const markers = []
+
+  if (durationSeconds && durationSeconds > 0 && wordCount > 0) {
+    const speechRate = round0((wordCount / durationSeconds) * 60)
+    markers.push({
+      id: 'speech-rate',
+      label: 'Speech rate',
+      value: speechRate,
+      unit: 'wpm',
+      description: 'Words per minute — bulbar muscle weakness in ALS causes progressive speech slowing',
+    })
+  }
+
+  markers.push(
+    {
+      id: 'avg-pause',
+      label: 'Avg pause duration',
+      value: audioFeatures.avgPauseDurationMs,
+      unit: 'ms',
+      description: 'Mean pause length — prolonged pauses reflect articulatory fatigue characteristic of ALS',
+    },
+    {
+      id: 'pause-freq',
+      label: 'Pause frequency',
+      value: audioFeatures.pauseFrequencyPerMinute,
+      unit: '/min',
+      description: 'Silent segments ≥250ms per minute detected from amplitude',
+    },
+    {
+      id: 'prosody',
+      label: 'Prosody variation',
+      value: audioFeatures.prosodyVariation,
+      unit: '%',
+      description: 'Energy variation across the recording — flat prosody indicates bulbar motor involvement',
+    },
+  )
+
+  const speechRateMarker = markers.find((m) => m.id === 'speech-rate')
+  const avgPauseMarker = markers.find((m) => m.id === 'avg-pause')
+  const pauseFreqMarker = markers.find((m) => m.id === 'pause-freq')
+  const prosodyMarker = markers.find((m) => m.id === 'prosody')
+
+  let riskScore = 0
+  let factors = 0
+
+  if (speechRateMarker) {
+    const rate = speechRateMarker.value
+    // ALS: strong signal below 90 wpm; mild signal above 160 wpm (rushing due to breath support loss)
+    if (rate < 90) riskScore += clamp(((90 - rate) / 60) * 100, 0, 100)
+    else if (rate > 160) riskScore += clamp(((rate - 160) / 60) * 100, 0, 100) * 0.3
+    factors++
+  }
+
+  if (avgPauseMarker) {
+    // ALS: pause duration is a stronger signal than frequency (articulatory fatigue)
+    riskScore += clamp((avgPauseMarker.value / 800) * 100, 0, 100)
+    factors++
+  }
+
+  if (pauseFreqMarker) {
+    riskScore += clamp((pauseFreqMarker.value / 12) * 100, 0, 100)
+    factors++
+  }
+
+  if (prosodyMarker) {
+    riskScore += clamp(100 - prosodyMarker.value, 0, 100)
+    factors++
+  }
+
+  const composite = factors > 0 ? round0(riskScore / factors) : null
+  const confidence = computeConfidence({
+    wordCount,
+    durationSeconds,
+    hasTranscript: wordCount > 0,
+    type: 'speech',
+  })
+
+  let summary = 'Acoustic markers computed from the submitted recording.'
+  if (composite !== null) {
+    if (composite >= 65) summary = 'Acoustic markers suggest bulbar motor involvement — reduced speech rate or prolonged pauses consistent with ALS.'
+    else if (composite >= 35) summary = 'Some acoustic markers fall outside typical ranges.'
+    else summary = 'Acoustic markers are within typical ranges for the extracted features.'
+  }
+
+  return {
+    modelName: 'ALS-Speech-v1',
+    condition: 'ALS',
+    riskScore: composite,
+    riskLevel: composite !== null ? riskFromScore(composite) : null,
+    confidence: composite !== null ? confidence : null,
+    markers,
+    summary,
+  }
+}
+
+// ── ALS Linguistic (ALS-Lex-v1) ──────────────────────────────────────────────
+// Markers: semantic coherence, lexical diversity, idea density, pronoun ratio
+
+function buildAlsLinguisticResult(text: string | null): ModelResult {
   if (!text || text.trim().length < 20) {
     return {
       modelName: 'ALS-Lex-v1',
@@ -173,7 +373,7 @@ function buildAlsResult(text: string | null): ModelResult {
       label: 'Semantic coherence',
       value: coherence,
       unit: '%',
-      description: 'Keyword overlap between consecutive sentences',
+      description: 'Keyword overlap between consecutive sentences — ALS cognitive involvement reduces coherence',
     },
     {
       id: 'lexical-div',
@@ -187,14 +387,14 @@ function buildAlsResult(text: string | null): ModelResult {
       label: 'Idea density',
       value: ideaDensity,
       unit: 'words/sent',
-      description: 'Content words per sentence',
+      description: 'Content words per sentence — reduced in ALS-related language changes',
     },
     {
       id: 'pronoun-ratio',
       label: 'Pronoun ratio',
       value: pronounRatio,
       unit: '%',
-      description: 'Pronouns as a share of total words',
+      description: 'Pronouns as a share of total words — elevated ratio is associated with reduced lexical access',
     },
   ]
 
@@ -213,7 +413,7 @@ function buildAlsResult(text: string | null): ModelResult {
 
   let summary = 'Linguistic markers computed from the submitted text.'
   if (composite >= 65) {
-    summary = 'Linguistic markers suggest possible bulbar or dysarthric speech patterns associated with ALS.'
+    summary = 'Linguistic markers suggest possible bulbar or cognitive speech patterns associated with ALS.'
   } else if (composite >= 35) {
     summary = 'Some linguistic markers fall outside typical ranges.'
   } else {
@@ -231,38 +431,36 @@ function buildAlsResult(text: string | null): ModelResult {
   }
 }
 
+// ── Main entry point ──────────────────────────────────────────────────────────
+
 export async function analyzeSample(input: AddSampleInput): Promise<{
   durationSeconds?: number
   transcript?: string
   results: NonNullable<Sample['results']>
 }> {
   const analysisText = getAnalysisText(input)
-  const textFeatures = analysisText ? extractTextFeatures(analysisText) : null
 
-  let audioFeatures: Awaited<ReturnType<typeof extractAudioFeatures>> | null = null
+  let audioFeatures: AudioFeatures | null = null
   let durationSeconds: number | undefined
 
   if (input.audioBlob) {
     audioFeatures = await extractAudioFeatures(input.audioBlob)
     durationSeconds = audioFeatures.durationSeconds
-  } else if (input.type === 'text') {
-    durationSeconds = undefined
   }
 
+  const textFeatures = analysisText ? extractTextFeatures(analysisText) : null
   const wordCount = textFeatures?.wordCount ?? 0
+  const speechAudio = input.type === 'speech' ? audioFeatures : null
 
-  const parkinson = buildParkinsonResult(
-    input.type === 'speech' ? audioFeatures : null,
-    wordCount,
-    durationSeconds,
-  )
+  const parkinsonAcoustic = buildParkinsonAcousticResult(speechAudio, wordCount, durationSeconds)
+  const parkinsonLinguistic = buildParkinsonLinguisticResult(analysisText)
+  const alsAcoustic = buildAlsAcousticResult(speechAudio, wordCount, durationSeconds)
+  const alsLinguistic = buildAlsLinguisticResult(analysisText)
 
-  const als = buildAlsResult(analysisText)
+  const allNull = [parkinsonAcoustic, parkinsonLinguistic, alsAcoustic, alsLinguistic]
+    .every((r) => r.riskScore === null)
 
-  if (
-    parkinson.riskScore === null &&
-    als.riskScore === null
-  ) {
+  if (allNull) {
     throw new Error(
       input.type === 'speech'
         ? 'Could not analyze sample. Provide audio with a transcript, or at least 20 characters of transcript text.'
@@ -273,7 +471,7 @@ export async function analyzeSample(input: AddSampleInput): Promise<{
   return {
     durationSeconds,
     transcript: input.transcript,
-    results: { parkinson, als },
+    results: { parkinsonAcoustic, parkinsonLinguistic, alsAcoustic, alsLinguistic },
   }
 }
 
