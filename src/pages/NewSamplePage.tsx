@@ -129,8 +129,7 @@ export function NewSamplePage() {
     }
   }
 
-  const isSpeechMode = mode === 'speech-upload' || mode === 'speech-record'
-  const canSubmit =
+const canSubmit =
     label.trim() &&
     !isSubmitting &&
     (mode === 'text' ? textContent.trim().length >= 20 : !!audioFile)
