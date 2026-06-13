@@ -304,19 +304,6 @@ export function NewSamplePage() {
           </Button>
         </CardBody>
       </Card>
-
-      {isSpeechMode && (
-        <Card>
-          <CardBody className="text-sm text-slate-500">
-            <p className="font-medium text-slate-800">Speech analysis requirements</p>
-            <ul className="mt-2 list-inside list-disc space-y-1">
-              <li>Audio is analyzed for pause frequency and prosody variation</li>
-              <li>A transcript enables speech rate and dysarthria linguistic marker extraction</li>
-              <li>Without a transcript, only acoustic markers are computed</li>
-            </ul>
-          </CardBody>
-        </Card>
-      )}
     </div>
   )
 }
