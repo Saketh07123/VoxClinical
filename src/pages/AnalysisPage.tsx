@@ -156,10 +156,10 @@ export function AnalysisPage() {
             </div>
           </div>
           <div>
-            <h3 className="mb-4 text-lg font-semibold text-slate-900">ALS (Amyotrophic Lateral Sclerosis)</h3>
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Dysarthria</h3>
             <div className="grid gap-4 lg:grid-cols-2">
-              <ModelResultCard result={sample.results.alsAcoustic} />
-              <ModelResultCard result={sample.results.alsLinguistic} />
+              <ModelResultCard result={sample.results.dysarthriaAcoustic} />
+              <ModelResultCard result={sample.results.dysarthriaLinguistic} />
             </div>
           </div>
         </div>

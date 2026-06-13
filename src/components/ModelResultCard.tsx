@@ -5,12 +5,12 @@ import { MarkerRow, ProgressBar } from './ProgressBar'
 
 const accentColors = {
   "Parkinson's": 'border-l-parkinson',
-  ALS: 'border-l-als',
+  Dysarthria: 'border-l-als',
 }
 
 const scoreColors = {
   "Parkinson's": 'text-parkinson',
-  ALS: 'text-als',
+  Dysarthria: 'text-als',
 }
 
 export function ModelResultCard({ result }: { result: ModelResult }) {
@@ -20,11 +20,7 @@ export function ModelResultCard({ result }: { result: ModelResult }) {
     <Card className={`border-l-4 ${accentColors[result.condition]}`}>
       <CardHeader
         title={result.modelName}
-        subtitle={
-          result.condition === 'ALS'
-            ? 'Amyotrophic Lateral Sclerosis linguistic markers'
-            : `${result.condition} linguistic markers`
-        }
+        subtitle={`${result.condition} markers`}
         action={result.riskLevel ? <RiskBadge level={result.riskLevel} /> : undefined}
       />
       <CardBody>

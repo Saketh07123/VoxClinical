@@ -311,7 +311,7 @@ export function NewSamplePage() {
             <p className="font-medium text-slate-800">Speech analysis requirements</p>
             <ul className="mt-2 list-inside list-disc space-y-1">
               <li>Audio is analyzed for pause frequency and prosody variation</li>
-              <li>A transcript enables speech rate and ALS linguistic marker extraction</li>
+              <li>A transcript enables speech rate and dysarthria linguistic marker extraction</li>
               <li>Without a transcript, only acoustic markers are computed</li>
             </ul>
           </CardBody>

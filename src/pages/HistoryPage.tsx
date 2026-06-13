@@ -36,7 +36,7 @@ export function HistoryPage() {
                 <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Status</th>
                 <th className="px-5 py-3">Parkinson&apos;s</th>
-                <th className="px-5 py-3">ALS</th>
+                <th className="px-5 py-3">Dysarthria</th>
                 <th className="px-5 py-3"></th>
               </tr>
             </thead>
@@ -88,21 +88,21 @@ export function HistoryPage() {
                   <td className="px-5 py-3.5">
                     {sample.results ? (
                       <div className="space-y-1">
-                        {sample.results.alsAcoustic.riskScore != null && (
+                        {sample.results.dysarthriaAcoustic.riskScore != null && (
                           <div className="flex items-center gap-1.5">
                             <span className="text-xs text-slate-400">Ac</span>
-                            <span className="font-semibold text-als">{sample.results.alsAcoustic.riskScore}</span>
-                            <RiskBadge level={sample.results.alsAcoustic.riskLevel!} />
+                            <span className="font-semibold text-als">{sample.results.dysarthriaAcoustic.riskScore}</span>
+                            <RiskBadge level={sample.results.dysarthriaAcoustic.riskLevel!} />
                           </div>
                         )}
-                        {sample.results.alsLinguistic.riskScore != null && (
+                        {sample.results.dysarthriaLinguistic.riskScore != null && (
                           <div className="flex items-center gap-1.5">
                             <span className="text-xs text-slate-400">Lx</span>
-                            <span className="font-semibold text-als">{sample.results.alsLinguistic.riskScore}</span>
-                            <RiskBadge level={sample.results.alsLinguistic.riskLevel!} />
+                            <span className="font-semibold text-als">{sample.results.dysarthriaLinguistic.riskScore}</span>
+                            <RiskBadge level={sample.results.dysarthriaLinguistic.riskLevel!} />
                           </div>
                         )}
-                        {sample.results.alsAcoustic.riskScore == null && sample.results.alsLinguistic.riskScore == null && (
+                        {sample.results.dysarthriaAcoustic.riskScore == null && sample.results.dysarthriaLinguistic.riskScore == null && (
                           <span className="text-slate-400">—</span>
                         )}
                       </div>

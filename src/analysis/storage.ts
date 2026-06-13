@@ -68,7 +68,7 @@ function migrateSample(raw: unknown): Sample {
   const sample = raw as Sample & {
     results?: {
       parkinson?: unknown
-      als?: unknown
+      dysarthria?: unknown
       alzheimer?: Record<string, unknown>
       parkinsonAcoustic?: unknown
     }
@@ -80,7 +80,7 @@ function migrateSample(raw: unknown): Sample {
   }
 
   // Drop results from old 2-model format — re-analysis needed
-  if (sample.results?.parkinson !== undefined || sample.results?.als !== undefined) {
+  if (sample.results?.parkinson !== undefined || sample.results?.dysarthria !== undefined) {
     return { ...sample, results: undefined, status: 'failed', errorMessage: 'Re-submit to run updated 4-model analysis.' }
   }
 

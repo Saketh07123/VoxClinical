@@ -229,24 +229,24 @@ function buildParkinsonLinguisticResult(text: string | null): ModelResult {
   }
 }
 
-// ── ALS Acoustic (ALS-Speech-v1) ─────────────────────────────────────────────
+// ── Dysarthria Acoustic (DysarthriaSpeech-v1) ─────────────────────────────────────────────
 // Markers: speech rate, avg pause duration, pause frequency, prosody variation
-// ALS bulbar onset causes progressive articulatory weakness — slower rate, prolonged pauses
+// Dysarthria causes progressive articulatory weakness — slower rate, prolonged pauses
 
-function buildAlsAcousticResult(
+function buildDysarthriaAcousticResult(
   audioFeatures: AudioFeatures | null,
   wordCount: number,
   durationSeconds: number | undefined,
 ): ModelResult {
   if (!audioFeatures) {
     return {
-      modelName: 'ALS-Speech-v1',
-      condition: 'ALS',
+      modelName: 'DysarthriaSpeech-v1',
+      condition: 'Dysarthria',
       riskScore: null,
       riskLevel: null,
       confidence: null,
       markers: [],
-      summary: 'No audio provided. Submit a speech recording for acoustic ALS analysis.',
+      summary: 'No audio provided. Submit a speech recording for acoustic dysarthria analysis.',
     }
   }
 
@@ -259,7 +259,7 @@ function buildAlsAcousticResult(
       label: 'Speech rate',
       value: speechRate,
       unit: 'wpm',
-      description: 'Words per minute — bulbar muscle weakness in ALS causes progressive speech slowing',
+      description: 'Words per minute — articulatory muscle weakness in dysarthria causes progressive speech slowing',
     })
   }
 
@@ -269,7 +269,7 @@ function buildAlsAcousticResult(
       label: 'Avg pause duration',
       value: audioFeatures.avgPauseDurationMs,
       unit: 'ms',
-      description: 'Mean pause length — prolonged pauses reflect articulatory fatigue characteristic of ALS',
+      description: 'Mean pause length — prolonged pauses reflect articulatory fatigue characteristic of dysarthria',
     },
     {
       id: 'pause-freq',
@@ -297,14 +297,14 @@ function buildAlsAcousticResult(
 
   if (speechRateMarker) {
     const rate = speechRateMarker.value
-    // ALS: strong signal below 90 wpm; mild signal above 160 wpm (rushing due to breath support loss)
+    // Dysarthria: strong signal below 90 wpm; mild signal above 160 wpm (rushing due to breath support loss)
     if (rate < 90) riskScore += clamp(((90 - rate) / 60) * 100, 0, 100)
     else if (rate > 160) riskScore += clamp(((rate - 160) / 60) * 100, 0, 100) * 0.3
     factors++
   }
 
   if (avgPauseMarker) {
-    // ALS: pause duration is a stronger signal than frequency (articulatory fatigue)
+    // Dysarthria: pause duration is a stronger signal than frequency (articulatory fatigue)
     riskScore += clamp((avgPauseMarker.value / 800) * 100, 0, 100)
     factors++
   }
@@ -329,14 +329,14 @@ function buildAlsAcousticResult(
 
   let summary = 'Acoustic markers computed from the submitted recording.'
   if (composite !== null) {
-    if (composite >= 65) summary = 'Acoustic markers suggest bulbar motor involvement — reduced speech rate or prolonged pauses consistent with ALS.'
+    if (composite >= 65) summary = 'Acoustic markers suggest bulbar motor involvement — reduced speech rate or prolonged pauses consistent with dysarthria.'
     else if (composite >= 35) summary = 'Some acoustic markers fall outside typical ranges.'
     else summary = 'Acoustic markers are within typical ranges for the extracted features.'
   }
 
   return {
-    modelName: 'ALS-Speech-v1',
-    condition: 'ALS',
+    modelName: 'DysarthriaSpeech-v1',
+    condition: 'Dysarthria',
     riskScore: composite,
     riskLevel: composite !== null ? riskFromScore(composite) : null,
     confidence: composite !== null ? confidence : null,
@@ -345,14 +345,14 @@ function buildAlsAcousticResult(
   }
 }
 
-// ── ALS Linguistic (ALS-Lex-v1) ──────────────────────────────────────────────
+// ── Dysarthria Linguistic (DysarthriaLex-v1) ──────────────────────────────────────────────
 // Markers: semantic coherence, lexical diversity, idea density, pronoun ratio
 
-function buildAlsLinguisticResult(text: string | null): ModelResult {
+function buildDysarthriaLinguisticResult(text: string | null): ModelResult {
   if (!text || text.trim().length < 20) {
     return {
-      modelName: 'ALS-Lex-v1',
-      condition: 'ALS',
+      modelName: 'DysarthriaLex-v1',
+      condition: 'Dysarthria',
       riskScore: null,
       riskLevel: null,
       confidence: null,
@@ -373,7 +373,7 @@ function buildAlsLinguisticResult(text: string | null): ModelResult {
       label: 'Semantic coherence',
       value: coherence,
       unit: '%',
-      description: 'Keyword overlap between consecutive sentences — ALS cognitive involvement reduces coherence',
+      description: 'Keyword overlap between consecutive sentences — dysarthria-related cognitive involvement reduces coherence',
     },
     {
       id: 'lexical-div',
@@ -387,7 +387,7 @@ function buildAlsLinguisticResult(text: string | null): ModelResult {
       label: 'Idea density',
       value: ideaDensity,
       unit: 'words/sent',
-      description: 'Content words per sentence — reduced in ALS-related language changes',
+      description: 'Content words per sentence — reduced in dysarthria-related language changes',
     },
     {
       id: 'pronoun-ratio',
@@ -413,7 +413,7 @@ function buildAlsLinguisticResult(text: string | null): ModelResult {
 
   let summary = 'Linguistic markers computed from the submitted text.'
   if (composite >= 65) {
-    summary = 'Linguistic markers suggest possible bulbar or cognitive speech patterns associated with ALS.'
+    summary = 'Linguistic markers suggest possible bulbar or cognitive speech patterns associated with dysarthria.'
   } else if (composite >= 35) {
     summary = 'Some linguistic markers fall outside typical ranges.'
   } else {
@@ -421,8 +421,8 @@ function buildAlsLinguisticResult(text: string | null): ModelResult {
   }
 
   return {
-    modelName: 'ALS-Lex-v1',
-    condition: 'ALS',
+    modelName: 'DysarthriaLex-v1',
+    condition: 'Dysarthria',
     riskScore: composite,
     riskLevel: riskFromScore(composite),
     confidence,
@@ -454,10 +454,10 @@ export async function analyzeSample(input: AddSampleInput): Promise<{
 
   const parkinsonAcoustic = buildParkinsonAcousticResult(speechAudio, wordCount, durationSeconds)
   const parkinsonLinguistic = buildParkinsonLinguisticResult(analysisText)
-  const alsAcoustic = buildAlsAcousticResult(speechAudio, wordCount, durationSeconds)
-  const alsLinguistic = buildAlsLinguisticResult(analysisText)
+  const dysarthriaAcoustic = buildDysarthriaAcousticResult(speechAudio, wordCount, durationSeconds)
+  const dysarthriaLinguistic = buildDysarthriaLinguisticResult(analysisText)
 
-  const allNull = [parkinsonAcoustic, parkinsonLinguistic, alsAcoustic, alsLinguistic]
+  const allNull = [parkinsonAcoustic, parkinsonLinguistic, dysarthriaAcoustic, dysarthriaLinguistic]
     .every((r) => r.riskScore === null)
 
   if (allNull) {
@@ -471,7 +471,7 @@ export async function analyzeSample(input: AddSampleInput): Promise<{
   return {
     durationSeconds,
     transcript: input.transcript,
-    results: { parkinsonAcoustic, parkinsonLinguistic, alsAcoustic, alsLinguistic },
+    results: { parkinsonAcoustic, parkinsonLinguistic, dysarthriaAcoustic, dysarthriaLinguistic },
   }
 }
 
