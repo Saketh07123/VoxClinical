@@ -85,11 +85,9 @@ export function DashboardPage() {
               View details <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <ModelResultCard result={latest.results.parkinsonAcoustic} />
-            <ModelResultCard result={latest.results.parkinsonLinguistic} />
-            <ModelResultCard result={latest.results.dementiaAcoustic} />
-            <ModelResultCard result={latest.results.dementiaLinguistic} />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <ModelResultCard result={latest.results.parkinson} />
+            <ModelResultCard result={latest.results.dementia} />
           </div>
         </div>
       )}
@@ -125,11 +123,11 @@ export function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <TypeBadge type={sample.type} />
-                  {(sample.results?.parkinsonAcoustic.riskLevel ?? sample.results?.parkinsonLinguistic.riskLevel) && (
-                    <RiskBadge level={(sample.results.parkinsonAcoustic.riskLevel ?? sample.results.parkinsonLinguistic.riskLevel)!} />
+                  {sample.results?.parkinson.riskLevel && (
+                    <RiskBadge level={sample.results.parkinson.riskLevel} />
                   )}
-                  {(sample.results?.dementiaAcoustic.riskLevel ?? sample.results?.dementiaLinguistic.riskLevel) && (
-                    <RiskBadge level={(sample.results.dementiaAcoustic.riskLevel ?? sample.results.dementiaLinguistic.riskLevel)!} />
+                  {sample.results?.dementia.riskLevel && (
+                    <RiskBadge level={sample.results.dementia.riskLevel} />
                   )}
                 </div>
               </button>

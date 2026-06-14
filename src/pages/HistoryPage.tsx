@@ -61,50 +61,20 @@ export function HistoryPage() {
                     <StatusBadge status={sample.status} />
                   </td>
                   <td className="px-5 py-3.5">
-                    {sample.results ? (
-                      <div className="space-y-1">
-                        {sample.results.parkinsonAcoustic.riskScore != null && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-slate-400">Ac</span>
-                            <span className="font-semibold text-parkinson">{sample.results.parkinsonAcoustic.riskScore}</span>
-                            <RiskBadge level={sample.results.parkinsonAcoustic.riskLevel!} />
-                          </div>
-                        )}
-                        {sample.results.parkinsonLinguistic.riskScore != null && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-slate-400">Lx</span>
-                            <span className="font-semibold text-parkinson">{sample.results.parkinsonLinguistic.riskScore}</span>
-                            <RiskBadge level={sample.results.parkinsonLinguistic.riskLevel!} />
-                          </div>
-                        )}
-                        {sample.results.parkinsonAcoustic.riskScore == null && sample.results.parkinsonLinguistic.riskScore == null && (
-                          <span className="text-slate-400">—</span>
-                        )}
+                    {sample.results?.parkinson.riskScore != null ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-parkinson">{sample.results.parkinson.riskScore}</span>
+                        <RiskBadge level={sample.results.parkinson.riskLevel!} />
                       </div>
                     ) : (
                       <span className="text-slate-400">—</span>
                     )}
                   </td>
                   <td className="px-5 py-3.5">
-                    {sample.results ? (
-                      <div className="space-y-1">
-                        {sample.results.dementiaAcoustic.riskScore != null && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-slate-400">Ac</span>
-                            <span className="font-semibold text-als">{sample.results.dementiaAcoustic.riskScore}</span>
-                            <RiskBadge level={sample.results.dementiaAcoustic.riskLevel!} />
-                          </div>
-                        )}
-                        {sample.results.dementiaLinguistic.riskScore != null && (
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-slate-400">Lx</span>
-                            <span className="font-semibold text-als">{sample.results.dementiaLinguistic.riskScore}</span>
-                            <RiskBadge level={sample.results.dementiaLinguistic.riskLevel!} />
-                          </div>
-                        )}
-                        {sample.results.dementiaAcoustic.riskScore == null && sample.results.dementiaLinguistic.riskScore == null && (
-                          <span className="text-slate-400">—</span>
-                        )}
+                    {sample.results?.dementia.riskScore != null ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-als">{sample.results.dementia.riskScore}</span>
+                        <RiskBadge level={sample.results.dementia.riskLevel!} />
                       </div>
                     ) : (
                       <span className="text-slate-400">—</span>

@@ -147,21 +147,9 @@ export function AnalysisPage() {
       )}
 
       {sample.status === 'complete' && sample.results && (
-        <div className="space-y-8">
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-slate-900">Parkinson&apos;s Disease</h3>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <ModelResultCard result={sample.results.parkinsonAcoustic} />
-              <ModelResultCard result={sample.results.parkinsonLinguistic} />
-            </div>
-          </div>
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-slate-900">Dementia</h3>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <ModelResultCard result={sample.results.dementiaAcoustic} />
-              <ModelResultCard result={sample.results.dementiaLinguistic} />
-            </div>
-          </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ModelResultCard result={sample.results.parkinson} />
+          <ModelResultCard result={sample.results.dementia} />
         </div>
       )}
     </div>

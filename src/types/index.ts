@@ -35,10 +35,8 @@ export interface Sample {
   status: SampleStatus
   errorMessage?: string
   results?: {
-    parkinsonAcoustic: ModelResult
-    parkinsonLinguistic: ModelResult
-    dementiaAcoustic: ModelResult
-    dementiaLinguistic: ModelResult
+    parkinson: ModelResult
+    dementia: ModelResult
   }
 }
 

@@ -65,23 +65,16 @@ export async function deleteAudioBlob(sampleId: string): Promise<void> {
 }
 
 function migrateSample(raw: unknown): Sample {
-  const sample = raw as Sample & {
-    results?: {
-      parkinson?: unknown
-      dementia?: unknown
-      alzheimer?: Record<string, unknown>
-      parkinsonAcoustic?: unknown
-    }
-  }
+  const sample = raw as Sample & { results?: Record<string, unknown> }
 
-  // Already in new 4-model format
-  if (sample.results?.parkinsonAcoustic !== undefined) {
+  // Already in current 2-model format
+  if (sample.results && 'parkinson' in sample.results && 'dementia' in sample.results) {
     return sample as Sample
   }
 
-  // Drop results from old 2-model format — re-analysis needed
-  if (sample.results?.parkinson !== undefined || sample.results?.dementia !== undefined) {
-    return { ...sample, results: undefined, status: 'failed', errorMessage: 'Re-submit to run updated 4-model analysis.' }
+  // Drop results from any old format — re-analysis needed
+  if (sample.results !== undefined) {
+    return { ...sample, results: undefined, status: 'failed', errorMessage: 'Re-submit to run updated analysis.' }
   }
 
   return sample as Sample
